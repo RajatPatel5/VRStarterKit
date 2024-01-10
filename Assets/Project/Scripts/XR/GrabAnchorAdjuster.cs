@@ -1,6 +1,8 @@
 using NaughtyAttributes;
 using System.Linq;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace Yudiz.XRStarter
@@ -9,12 +11,12 @@ namespace Yudiz.XRStarter
     public class GrabAnchorAdjuster : MonoBehaviour
     {
         private XRCustomGrabbable grabbable;
+#if UNITY_EDITOR
 
         private void Awake()
         {
             grabbable = GetComponent<XRCustomGrabbable>();
         }
-
         #region EDITOR_TOOLS_METHODS
         private string handPosesFolderPath = "Assets/Project/Models/Controller/Oculus Hands/Prefabs/";
         private GameObject leftHandPreview;
@@ -125,5 +127,6 @@ namespace Yudiz.XRStarter
             return handPosesFolderPath + prefabName + ".prefab";
         }
         #endregion
+#endif
     }
 }

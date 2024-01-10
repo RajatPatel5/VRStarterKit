@@ -4,7 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -91,6 +93,7 @@ namespace Yudiz.XRStarter
         }
         #endregion
 
+#if UNITY_EDITOR
         #region EDITOR_TOOLS_METHODS
         private string handPosesFolderPath = "Assets/Project/Models/Controller/Oculus Hands/Prefabs/";
         private GameObject leftHandPreview;
@@ -191,5 +194,6 @@ namespace Yudiz.XRStarter
             return handPosesFolderPath + prefabName + ".prefab";
         }
         #endregion
+#endif
     }
 }

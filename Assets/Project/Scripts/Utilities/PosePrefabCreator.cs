@@ -1,9 +1,12 @@
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 using Yudiz.XRStarter;
 
 public class PosePrefabCreator : MonoBehaviour
 {
+#if UNITY_EDITOR
     public GameObject handModel; // Assign your hand model prefab in the Inspector
     public AnimationClip[] poseAnimations; // Assign your single-frame animations in the Inspector
     public HandSide handSide;
@@ -38,4 +41,5 @@ public class PosePrefabCreator : MonoBehaviour
         //PrefabUtility.CreatePrefab("Assets/Prefabs/Hand_Prefab.prefab", instantiatedHand);
         DestroyImmediate(instantiatedHand);
     }
+#endif
 }
