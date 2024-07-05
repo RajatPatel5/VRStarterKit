@@ -8,7 +8,9 @@ using Unity.VisualScripting;
 using UnityEditor;
 #endif
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit;
+using Yudiz.XRStarter.Interactions;
 
 namespace Yudiz.XRStarter
 {
@@ -23,10 +25,22 @@ namespace Yudiz.XRStarter
         private Vector3 grabbedPosition;
         private Quaternion grabbedRotation;
 
+        private SnapZone socketInteractor;
+        protected Collider interactableCollider;
+
+        public UnityEvent<XRCustomGrabbable> OnGrabbed;
+        public UnityEvent<XRCustomGrabbable> OnReleased;
+
         #region UNITY_CALLBACKS
         protected override void Awake()
         {
             base.Awake();
+
+            interactableCollider = GetComponent<Collider>();
+            if (interactableCollider == null)
+            {
+                interactableCollider = GetComponentInChildren<Collider>();
+            }
         }
         protected override void OnEnable()
         {
@@ -81,6 +95,8 @@ namespace Yudiz.XRStarter
                 grabbedPosition = transform.position;
                 grabbedRotation = transform.rotation;
             }
+
+            OnGrabbed?.Invoke(this);
         }
 
         private void OnItemReleased(SelectExitEventArgs arg0)
@@ -90,110 +106,45 @@ namespace Yudiz.XRStarter
                 transform.position = grabbedPosition;
                 transform.rotation = grabbedRotation;
             }
+            OnReleased?.Invoke(this);
+        }
+        #endregion
+
+        #region PUBLIC_METHODS
+        public void ToggleInteractableCollider(bool enabled)
+        {
+            if (interactableCollider == null)
+                return;
+            interactableCollider.enabled = enabled;
         }
         #endregion
 
 #if UNITY_EDITOR
         #region EDITOR_TOOLS_METHODS
-        private string handPosesFolderPath = "Assets/Project/Models/Controller/Oculus Hands/Prefabs/";
-        private GameObject leftHandPreview;
-        private GameObject rightHandPreview;
-        [ContextMenu("SpawnLeftHandPreview")]
-        public void SpawnLeftHandPreview()
+        [ContextMenu("AddGrabAdjuster")]
+        public void AddGrabAdjuster()
         {
-            if (leftHandPreview != null)
-                return;
-
-            if (leftAnchorTransform == null)
-            {
-                GameObject leftAnchor = new GameObject("LeftHand_AnchorTransform");
-                leftAnchor.transform.parent = transform;
-                leftAnchor.transform.localPosition = Vector3.zero;
-                leftAnchor.transform.localRotation = Quaternion.identity;
-                leftAnchorTransform = leftAnchor.transform;
-            }
-
-            leftAnchorTransform.transform.localScale = Vector3.one;
-            Vector3 globalScale = leftAnchorTransform.transform.lossyScale;
-            leftAnchorTransform.transform.localScale = new Vector3(1 / globalScale.x, 1 / globalScale.y, 1 / globalScale.z);
-
-            ControllerAvatar[] avatars = FindObjectsOfType<ControllerAvatar>();
-            ControllerAvatar handAvatar = avatars.ToList().Find(x => x.HandSide == HandSide.Left);
-
-            rightHandPreview = PrefabUtility.LoadPrefabContents(GetHandPosePrefab(HandSide.Right, grabType));
-            rightHandPreview.transform.parent = rightAnchorTransform;
-            leftHandPreview.transform.localPosition = handAvatar.AvatarTransform.localPosition;
-            leftHandPreview.transform.localRotation = handAvatar.AvatarTransform.localRotation;
-            
-            leftHandPreview.transform.localScale = Vector3.one;
-            globalScale = leftHandPreview.transform.lossyScale;
-            leftHandPreview.transform.localScale = new Vector3(1 / globalScale.x, 1 / globalScale.y, 1 / globalScale.z);
+            gameObject.AddComponent<GrabAnchorAdjuster>();
         }
-        [ContextMenu("RemoveLeftHandPreview")]
-        public void RemoveLeftHandPreview()
+
+        [ContextMenu("RemoveGrabAdjuster")]
+        public void RemoveGrabAdjuster()
         {
-            if (leftHandPreview != null)
-            {
-                DestroyImmediate(leftHandPreview);
-            }
+            DestroyImmediate(gameObject.GetComponent<GrabAnchorAdjuster>());
         }
-        [ContextMenu("SpawnRightHandPreview")]
-        public void SpawnRightHandPreview()
-        {
-            if (rightHandPreview != null)
-                return;
 
-            if (rightAnchorTransform == null)
-            {
-                GameObject leftAnchor = new GameObject("RightHand_AnchorTransform");
-                leftAnchor.transform.parent = transform;
-                leftAnchor.transform.localPosition = Vector3.zero;
-                leftAnchor.transform.localRotation = Quaternion.identity;
-                rightAnchorTransform = leftAnchor.transform;
-            }
-            
-            rightAnchorTransform.transform.localScale = Vector3.one;
-            Vector3 globalScale = rightAnchorTransform.transform.lossyScale;
-            rightAnchorTransform.transform.localScale = new Vector3(1 / globalScale.x, 1 / globalScale.y, 1 / globalScale.z);
-
-            ControllerAvatar[] avatars = FindObjectsOfType<ControllerAvatar>();
-            ControllerAvatar handAvatar = avatars.ToList().Find(x => x.HandSide == HandSide.Right);
-
-
-            rightHandPreview = PrefabUtility.LoadPrefabContents(GetHandPosePrefab(HandSide.Right, grabType));
-            rightHandPreview.transform.parent = rightAnchorTransform;
-            rightHandPreview.transform.localPosition = handAvatar.AvatarTransform.localPosition;
-            rightHandPreview.transform.localRotation = handAvatar.AvatarTransform.localRotation;
-            
-            rightHandPreview.transform.localScale = Vector3.one;
-            globalScale = rightHandPreview.transform.lossyScale;
-            rightHandPreview.transform.localScale = new Vector3(1 / globalScale.x, 1 / globalScale.y, 1 / globalScale.z);
-        }
-        [ContextMenu("RemoveRightHandPreview")]
-        public void RemoveRightHandPreview()
-        {
-            if (rightHandPreview != null)
-            {
-                DestroyImmediate(rightHandPreview);
-            }
-        }
-        public string GetHandPosePrefab(HandSide handSide, HandGrabType grabType)
-        {
-            string prefabName = string.Empty;
-            if(handSide == HandSide.Left)
-            {
-                prefabName = "Left_hand_";
-            }
-            else
-            {
-                prefabName = "Right_hand_";
-            }
-
-            prefabName += grabType.ToString().ToLower();
-
-            return handPosesFolderPath + prefabName + ".prefab";
-        }
         #endregion
 #endif
+
+        #region SNAPPING
+        public void OnSocketAttached(SelectEnterEventArgs args)
+        {
+            socketInteractor = args.interactorObject as SnapZone;
+        }
+        public void OnSocketDetached(SelectExitEventArgs args)
+        {
+            socketInteractor = null;
+        }
+        #endregion
     }
 }

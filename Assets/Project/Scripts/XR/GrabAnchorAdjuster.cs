@@ -50,8 +50,8 @@ namespace Yudiz.XRStarter
 
             leftHandPreview = PrefabUtility.LoadPrefabContents(GetHandPosePrefab(HandSide.Right, grabbable.grabType));
             leftHandPreview.transform.parent = grabbable.leftAnchorTransform;
-            leftHandPreview.transform.localPosition = handAvatar.AvatarTransform.localPosition;
-            leftHandPreview.transform.localRotation = handAvatar.AvatarTransform.localRotation;
+            leftHandPreview.transform.localPosition = handAvatar.HandTransform.localPosition;
+            leftHandPreview.transform.localRotation = handAvatar.HandTransform.localRotation;
 
             leftHandPreview.transform.localScale = Vector3.one;
             globalScale = leftHandPreview.transform.lossyScale;
@@ -95,8 +95,8 @@ namespace Yudiz.XRStarter
 
             rightHandPreview = PrefabUtility.LoadPrefabContents(GetHandPosePrefab(HandSide.Right, grabbable.grabType));
             rightHandPreview.transform.parent = grabbable.rightAnchorTransform;
-            rightHandPreview.transform.localPosition = handAvatar.AvatarTransform.localPosition;
-            rightHandPreview.transform.localRotation = handAvatar.AvatarTransform.localRotation;
+            rightHandPreview.transform.localPosition = handAvatar.HandTransform.localPosition;
+            rightHandPreview.transform.localRotation = handAvatar.HandTransform.localRotation;
 
             rightHandPreview.transform.localScale = Vector3.one;
             globalScale = rightHandPreview.transform.lossyScale;

@@ -11,6 +11,15 @@ namespace Yudiz.XRStarter
     {
         public HandSide HandSide { get => handSide; }
         public HandGrabType defaultGrabType = HandGrabType.Default;
+        public Transform HandTransform
+        {
+            get
+            {
+                if (handTransform == null)
+                    handTransform = AvatarTransform.GetChild(0);
+                return handTransform;
+            }
+        }
         public Transform AvatarTransform
         {
             get
@@ -25,16 +34,23 @@ namespace Yudiz.XRStarter
         [SerializeField] private HandSide handSide;
 
         private Transform avatarTransform;
+        private Transform handTransform;
         private XRDirectInteractor interactor;
         private HandGrabType handGrabType;
 
         private const string handTypeParam = "HandState";
 
         #region UNITY_CALLBACKS
+        private void OnValidate()
+        {
+            avatarTransform = transform.GetChild(0);
+            handTransform = avatarTransform.GetChild(0);
+        }
         private void Awake()
         {
             interactor = GetComponent<XRDirectInteractor>();
             avatarTransform = transform.GetChild(0);
+            handTransform = avatarTransform.GetChild(0);
         }
         private void OnEnable()
         {
