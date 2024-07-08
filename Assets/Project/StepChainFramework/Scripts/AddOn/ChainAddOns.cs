@@ -284,4 +284,108 @@ namespace ChainFramework
         }
         #endregion
     }
+
+    public class RotateMaxConditionalStep : IChainStep
+    {
+        #region Fields
+        private Action _completedAction;
+        private RotateInteractable _rotateInteractable;
+        #endregion
+
+        #region Properties
+        public bool IsInitiated { get; set; } = false;
+        public bool IsCompleted { get; set; } = false;
+
+        #endregion
+
+        #region Constructor
+        public RotateMaxConditionalStep(RotateInteractable rotateInteractable, Action completedAction = null)
+        {
+            _rotateInteractable = rotateInteractable;
+            _completedAction = completedAction;
+        }
+        #endregion
+
+        #region Methods
+        public void OnChainStart()
+        {
+
+        }
+        public void Execute()
+        {
+            if (!IsInitiated)
+            {
+                _rotateInteractable.OnObjectRotationMaxReached.AddListener(OnRotated);
+                IsInitiated = true;
+            }
+        }
+
+        public void AutoComplete()
+        {
+            IsCompleted = true;
+        }
+        public void OnRotated(RotateInteractable rotator)
+        {
+            _rotateInteractable.OnObjectRotationMaxReached.RemoveListener(OnRotated);
+            _completedAction?.Invoke();
+            IsCompleted = true;
+        }
+        public void Kill()
+        {
+            _rotateInteractable.OnObjectRotationMaxReached.RemoveListener(OnRotated);
+        }
+        #endregion
+    }
+
+    public class RotateMinConditionalStep : IChainStep
+    {
+        #region Fields
+        private Action _completedAction;
+        private RotateInteractable _rotateInteractable;
+        #endregion
+
+        #region Properties
+        public bool IsInitiated { get; set; } = false;
+        public bool IsCompleted { get; set; } = false;
+
+        #endregion
+
+        #region Constructor
+        public RotateMinConditionalStep(RotateInteractable rotateInteractable, Action completedAction = null)
+        {
+            _rotateInteractable = rotateInteractable;
+            _completedAction = completedAction;
+        }
+        #endregion
+
+        #region Methods
+        public void OnChainStart()
+        {
+
+        }
+        public void Execute()
+        {
+            if (!IsInitiated)
+            {
+                _rotateInteractable.OnObjectRotationMinReached.AddListener(OnRotated);
+                IsInitiated = true;
+            }
+        }
+
+        public void AutoComplete()
+        {
+            IsCompleted = true;
+        }
+        public void OnRotated(RotateInteractable rotator)
+        {
+            _rotateInteractable.OnObjectRotationMinReached.RemoveListener(OnRotated);
+            _completedAction?.Invoke();
+            IsCompleted = true;
+        }
+        public void Kill()
+        {
+            _rotateInteractable.OnObjectRotationMinReached.RemoveListener(OnRotated);
+        }
+        #endregion
+    }
 }

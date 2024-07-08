@@ -22,14 +22,20 @@ namespace Yudiz.XRStarter
         public HandGrabType grabType;
         public bool shouldResetOnRelease;
 
+        [Header("Snap Properties")]
+        public Transform snappableTransform;
+
+        [Header("Events")]
+        public UnityEvent<XRCustomGrabbable> OnGrabbed;
+        public UnityEvent<XRCustomGrabbable> OnReleased;
+
+
         private Vector3 grabbedPosition;
         private Quaternion grabbedRotation;
 
         private SnapZone socketInteractor;
         protected Collider interactableCollider;
 
-        public UnityEvent<XRCustomGrabbable> OnGrabbed;
-        public UnityEvent<XRCustomGrabbable> OnReleased;
 
         #region UNITY_CALLBACKS
         protected override void Awake()

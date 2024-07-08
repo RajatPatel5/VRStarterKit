@@ -14,8 +14,8 @@ namespace Yudiz.XRStarter.Interactions
         [SerializeField] private Transform snapAttachTransform;
         [SerializeField] private float distanceToDetech = 0.4f;
         [SerializeField] private bool lerpSnap;
-        [ShowIf("lerpSnap")] [SerializeField] private float snapSpeed = 10f;
-        [ShowIf("lerpSnap")] [SerializeField] private float alignSpeed = 50f;
+        [ShowIf("lerpSnap")][SerializeField] private float snapSpeed = 10f;
+        [ShowIf("lerpSnap")][SerializeField] private float alignSpeed = 50f;
 
         [Header("Other")]
         [SerializeField] private Transform snappableItem;
@@ -54,6 +54,17 @@ namespace Yudiz.XRStarter.Interactions
                             ChangeSnapState(SnapState.Snapping);
                         }
                         break;
+                    case SnapAttachType.Object:
+                        if (other.TryGetComponent(out XRCustomGrabbable grabbable))
+                        {
+                            if (grabbable.snappableTransform == snappableItem)
+                            {
+                                attachingItemParent = grabbable.transform;
+                                attachingTransform = grabbable.snappableTransform;
+                                ChangeSnapState(SnapState.Snapping);
+                            }
+                        }
+                        break;
                 }
             }
         }
@@ -67,6 +78,15 @@ namespace Yudiz.XRStarter.Interactions
                         if (other.TryGetComponent(out ControllerAvatar controllerAvatar))
                         {
                             if (controllerAvatar.AvatarTransform == attachingTransform)
+                            {
+                                ChangeSnapState(SnapState.Detaching);
+                            }
+                        }
+                        break;
+                    case SnapAttachType.Object:
+                        if (other.TryGetComponent(out XRCustomGrabbable grabbable))
+                        {
+                            if (grabbable.snappableTransform == attachingTransform)
                             {
                                 ChangeSnapState(SnapState.Detaching);
                             }
@@ -106,19 +126,19 @@ namespace Yudiz.XRStarter.Interactions
         }
         private void CheckForDetech(Transform snappingItem, Transform itemParent)
         {
-            if(Vector3.Distance(snappingItem.position, itemParent.position) > distanceToDetech)
+            if (Vector3.Distance(snappingItem.position, itemParent.position) > distanceToDetech)
             {
                 ChangeSnapState(SnapState.Detaching);
             }
         }
         private void ChangeSnapState(SnapState newState)
         {
-            if(newState == snapState) { return; }
+            if (newState == snapState) { return; }
 
             ExitState(snapState);
             snapState = newState;
             EnterState(snapState);
-            
+
         }
         private void ExitState(SnapState state)
         {
@@ -194,6 +214,10 @@ namespace Yudiz.XRStarter.Interactions
                     }
                     break;
             }
+        }
+        public Transform GetAttachedReferenceTransform()
+        {
+            return attachingItemParent;
         }
         #endregion
     }

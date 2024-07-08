@@ -26,5 +26,17 @@ namespace ChainFramework
             chain.AddAction(new UnGrabbedConditionalStep(grabbable, completedAction));
             return chain;
         }
+
+        public static Chain AddRotateMaxCondition(this Chain chain, RotateInteractable rotateInteractable, Action completedAction = null)
+        {
+            chain.AddAction(new RotateMaxConditionalStep(rotateInteractable, completedAction));
+            return chain;
+        }
+
+        public static Chain AddRotateMinCondition(this Chain chain, RotateInteractable rotateInteractable, Action completedAction = null)
+        {
+            chain.AddAction(new RotateMinConditionalStep(rotateInteractable, completedAction));
+            return chain;
+        }
     }
 }
